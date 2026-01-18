@@ -1,5 +1,7 @@
 <?php
       session_start();
+
       session_destroy();
-      header("Location: ../LoginIndex.php");
+      header("Location: ../Login-Register-Password/LoginIndex.php");
+      exit;
 ?>
