@@ -8,8 +8,8 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="card">
             <div class="card-header">
                 <h4>
-                    Product Lists
-                    <a href="goods-create.php" class="btn btn-primary float-end">Add Products</a>
+                    Orders Lists
+                    <a href="orders-create.php" class="btn btn-primary float-end">Add Order</a>
                 </h4>
             </div>
            <div class="card-body">
@@ -21,32 +21,40 @@ require_once __DIR__ . '/../includes/header.php';
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Brand</th>
-                <th>Model</th>
-                <th>Year</th>
-                <th>Price</th>
-                <th>Is On Sale</th>
+                <th>User</th>
+                <th>Total</th>
+                <th>Payment Method</th>
+                <th>Card Name</th>
+                <th>Card Number</th>
+                <th>Card Expiry</th>
+                <th>Card CVV</th>
+                <th>Payed</th>
+                <th>Delivered</th>
                 <th>Action</th>
             </tr>
         </thead>
         <tbody>
             <?php 
-            $cars = getAll('goods');
+            $cars = getAll('orders');
             if(mysqli_num_rows($cars) > 0){
                 foreach($cars as $item){
                     ?>
                     
                     <tr class="Information">
     <td data-label="Id"><?= $item['id']; ?></td>
-    <td data-label="Brand"><?= $item['brand']; ?></td>
-    <td data-label="Model"><?= $item['model']; ?></td>
-    <td data-label="Year"><?= $item['year']; ?></td>
-    <td data-label="Price"><?= $item['price']; ?></td>
-     <td data-label="Status"><?= $item['IsOnSale'] == 1 ? 'On Sale' : 'Not on Sale'; ?></td>
-     
+    <td data-label="User"><?= $item['user_id']; ?></td>
+    <td data-label="Total"><?= $item['total']; ?></td>
+    <td data-label="Payment Method"><?= $item['payment_method']; ?></td>
+    <td data-label="Card Name"><?= $item['card_name']; ?></td>
+    <td data-label="Card Number"><?= $item['card_number']; ?></td>
+    <td data-label="Card Expiry"><?= $item['card_expiry']; ?></td>
+    <td data-label="Card CVV"><?= $item['card_cvv']; ?></td>
+    <td data-label="Payed"><?= $item['order_status'] == 0 ? 'Pending' : 'Paid'; ?></td>
+    <td data-label="Delivered"><?= $item['delivered'] == 0 ? 'Not Delivered' : 'Delivered'; ?></td>      
+
     <td data-label="Action">
-        <a href="goods-edit.php?id=<?= $item['id']; ?>" class="btn btn-success btn-sm">Edit</a>
-        <a href="goods-delete.php?id=<?= $item['id']; ?>" class="btn btn-danger btn-sm mx-2"
+        <a href="orders-edit.php?id=<?= $item['id']; ?>" class="btn btn-success btn-sm">Edit</a>
+        <a href="orders-delete.php?id=<?= $item['id']; ?>" class="btn btn-danger btn-sm mx-2"
            onclick="return confirm('Are you sure you want to delete this data?');">
            Delete
         </a>

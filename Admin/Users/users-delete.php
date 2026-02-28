@@ -1,30 +1,26 @@
-
 <?php
-require '../Admin/config/function.php';
+require '../config/function.php';
 
 $parameter = checkParamId('id');
-if(is_numeric($parameter)){
+if (is_numeric($parameter)) {
 
     $userId = validate($parameter);
 
     $user = getById('users', $userId);
-    if($user['status'] == 200){
+    if ($user['status'] == 200) {
 
         $deleteQuery = deleteQuery('users', $userId);
 
-        if($deleteQuery){
+        if ($deleteQuery) {
 
             redirect('users.php', 'User/Admin Deleted Successfully');
-        }else{
+        } else {
             redirect('users.php', 'Something Went Wrong');
         }
-
-    }else{
+    } else {
         redirect('users.php', $user['message']);
     }
-
-    
-}else{
+} else {
     redirect('users.php', $parameter);
 }
 ?>

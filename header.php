@@ -2,9 +2,11 @@
 //session_start();
  include("php/Connect/connect.php");
 
+ $currentPage = basename($_SERVER['PHP_SELF']);
+ 
 if (!isset($_SESSION['id'])) {
     // If the user is not logged in, redirect to the login page
-    header("Location: ../Login-Register-Password/LoginIndex.php");
+    header("Location: ../Login-Register-Password/Login.php");
     exit();
 }
 
@@ -41,7 +43,7 @@ $result->free_result();
 
         <div class="right-links">
             <a href="../home.php"><button class="btn">Home </button></a> 
-            <a href="../php/cart.php"><button class="btn">Cart </button></a> 
+            
             <a href="../php/complain.php"> <button class="btn">Complain</button></a>
 
 
@@ -53,6 +55,7 @@ $result->free_result();
             </div>
         </div>
 
+        <a href="../php/cart.php"><button class="btn">Cart </button></a> 
         </div>
     </div>
 <!--<a href="home.php"><button class="btn">Continue Shopping</button></a>-->

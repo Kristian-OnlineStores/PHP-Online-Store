@@ -1,8 +1,8 @@
-<?php require '../Admin/config/function.php'; 
+<?php //require '../Admin/config/function.php'; 
 
-//require_once __DIR__ . '/../config/function.php';
+require_once __DIR__ . '/../config/function.php';
 
-
+$base_url = getBasePath();
 ?>
 
 <!DOCTYPE html>
@@ -21,11 +21,11 @@
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,800" rel="stylesheet" />
   
-  <!-- Nucleo Icons -->
+  <!-- Nucleo Icons 
    <link href="assets/css/nucleo-icons.css" rel="stylesheet" />
-
-   <link href="assets/css/nucleo-svg.css" rel="stylesheet" />
-
+   <link href="assets/css/nucleo-svg.css" rel="stylesheet" />-->
+  <link href="<?= $base_url ?>assets/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="<?= $base_url ?>assets/css/nucleo-svg.css" rel="stylesheet" />
 
   <!-- Font Awesome Icons 
   <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>-->
@@ -35,10 +35,10 @@
 
           <!--<link href="assets/css/nucleo-svg.css" rel="stylesheet" />-->
   
-  <!-- CSS Files -->
-  <link id="pagestyle" href="assets/css/soft-ui-dashboard.css?v=1.1.0" rel="stylesheet" />
-
-  
+  <!-- CSS Files 
+  <link id="page" href="assets/css/soft-ui-dashboard.css?v=1.1.0" rel="stylesheet" />
+-->
+   <link id="pagestyle" href="<?= $base_url ?>assets/css/soft-ui-dashboard.css?v=1.1.0" rel="stylesheet" />
 
   
 </head>

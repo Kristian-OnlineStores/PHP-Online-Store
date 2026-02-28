@@ -13,11 +13,22 @@
 
         <?php 
         
-         
+         require_once  '../php/config/function.php';
          include("../php/Connect/connect.php");
 
          if(isset($_POST['submit'])){
-            $firstname = $_POST['firstName'];
+$data = [
+    'firstName' => $_POST['firstName'],
+    'lastName' => $_POST['lastName'],
+    'email' => $_POST['email'],
+    'password' => $_POST['password'],
+    'confirmPassword' => $_POST['confirmPassword']
+];
+$result = RegisterUser($con, $data);
+
+
+
+           /* $firstname = $_POST['firstName'];
             $lastname = $_POST['lastName'];
             $email = $_POST['email'];
             $password = $_POST['password'];
@@ -49,11 +60,22 @@
             echo "<div class='message'>
                       <p>Registration successfully!</p>
                   </div> <br>";
-            echo "<a href='../Login-Register-Password/LoginIndex.php'><button class='btn'>Login Now</button>";
+            echo "<a href='../Login-Register-Password/Login.php'><button class='btn'>Login Now</button>";
          
 
          }
-}
+}*/
+             if(isset($result['error'])) {
+                    echo "<div class='message'>
+                            <p>{$result['error']}</p>
+                          </div><br>
+                          <a href='javascript:self.history.back()'><button class='btn'>Go Back</button></a>";
+                } else {
+                    echo "<div class='message'>
+                            <p>Registration successful!</p>
+                          </div><br>
+                          <a href='../Login-Register-Password/Login.php'><button class='btn'>Login Now</button></a>";
+                }
          }else{
          
         ?>
@@ -85,7 +107,7 @@
                 <input type="submit" class="btn" name="submit" value="Register" required>
             </div>
                 <div class="links">
-                    Already a member? <a href="../Login-Register-Password/LoginIndex.php">Sign In</a>
+                    Already a member? <a href="../Login-Register-Password/Login.php">Sign In</a>
                 </div>
             </form>
         </div>

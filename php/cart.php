@@ -1,13 +1,69 @@
 <?php
 
 session_start();
+
+require_once '../php/config/function.php';
 include("../php/Connect/connect.php");
 include("../header.php");
 
-if(!isset($_SESSION['valid'])){
-    header("Location: LoginIndex.php");
+/*if(!isset($_SESSION['valid'])){
+    header("Location: Login.php");
+    exit();
+}*/
+if(!isLoggedIn()) {
+    header("Location: Login.php");
     exit();
 }
+$user_id = $_SESSION['id'];
+
+
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = array();
+}
+
+if (isset($_GET['action'])) {
+    $messages = " ";
+
+    switch ($_GET['action']) {
+        case 'add':
+           if(isset($_GET['id'])) {
+                $result = AddToCart($con, $user_id, intval($_GET['id']));
+                if(isset($result['error'])) {
+                    $message = 'error=' . urlencode($result['error']);
+                } else {
+                    $message = 'message=added';
+                }
+            }
+            break;
+case 'remove':
+    if (isset($_GET['id'])) {
+        RemoveFromCart($con, $user_id, intval($_GET['id']));
+        $message = 'message=removed';
+    }
+    break;
+        case 'clear':
+            ClearCart($con, $user_id);
+            $message = 'message=cleared';
+            break;
+        default:
+           
+            break;
+    }
+     if($message) {
+        header("Location: cart.php?$message");
+        exit();
+    }
+}
+
+if (isset($_POST['update_cart'])) {
+  UpdateCart($con, $user_id, $_POST['quantities']);
+    header("Location: cart.php?message=updated");
+    exit();
+}
+
+
+
+/*
 
 
 function syncCartWithDatabase($con, $user_id, $session_cart) {
@@ -17,25 +73,21 @@ function syncCartWithDatabase($con, $user_id, $session_cart) {
     $delete_stmt->close();
     
     if (!empty($session_cart)) {
-        $insert_stmt = $con->prepare("INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, ?)");
-        foreach ($session_cart as $car_id => $item) {
-            $insert_stmt->bind_param("iii", $user_id, $car_id, $item['quantity']);
+        $insert_stmt = $con->prepare("INSERT INTO cart (user_id, goods_id, quantity) VALUES (?, ?, ?)");
+        foreach ($session_cart as $item_id => $item) {
+            
+            $insert_stmt->bind_param("iii", $user_id, $item_id, $item['quantity']);
             $insert_stmt->execute();
         }
         $insert_stmt->close();
     }
 }
 
-if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = array();
-}
-
-
 if (isset($_GET['action']) && $_GET['action'] == 'add' && isset($_GET['id'])) {
     $car_id = intval($_GET['id']);
     $user_id = $_SESSION['id'];
     
-    $car_query = $con->prepare("SELECT * FROM cars WHERE id = ?");
+    $car_query = $con->prepare("SELECT * FROM goods WHERE id = ?");
     $car_query->bind_param("i", $car_id);
     $car_query->execute();
     $car_result = $car_query->get_result();
@@ -120,7 +172,8 @@ while ($row = $result->fetch_assoc()) {
     $res_id = $row['id'];
 }
 
-$query->close();
+$query->close();*/
+
 ?>
 
 <!DOCTYPE html>
@@ -170,10 +223,10 @@ $query->close();
                     </thead>
                     <tbody>
                         <?php 
-                        $total = 0;
+                        $total = CartTotal($_SESSION['cart']);
                         foreach ($_SESSION['cart'] as $id => $item): 
                             $item_total = $item['price'] * $item['quantity'];
-                            $total += $item_total;
+                            
                         ?>
                         <tr>
                             <td><?php echo $item['brand'] . ' ' . $item['model']; ?></td>
@@ -185,7 +238,7 @@ $query->close();
                             </td>
                             <td><?php echo number_format($item_total, 2); ?> lv</td>
                             <td>
-                                <a href="cart.php?remove=<?php echo $id; ?>">Remove</a>
+                                <a href="cart.php?action=remove&id=<?php echo $id; ?>">Remove</a>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -198,7 +251,7 @@ $query->close();
                 
                 <div style="display: flex; justify-content: space-between;">
                     <input type="submit" name="update_cart" value="Update Cart" class="btn">
-                    <a href="cart.php?clear=1" class="btn" style="background: #dc3545;">Clear Cart</a>
+                    <a href="cart.php?action=clear" class="btn" style="background: #dc3545;">Clear Cart</a>
                     <a href="checkout.php" class="btn-checkout">Proceed to Checkout</a>
                 </div>
             </form>

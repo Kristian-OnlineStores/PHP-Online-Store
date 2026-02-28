@@ -61,7 +61,7 @@ function closeModal() {
  <?php
 
 
-$sql = "SELECT * FROM cars";
+$sql = "SELECT * FROM goods";
 $result = $con->query($sql);
 
 
@@ -86,7 +86,9 @@ while ($row = $result->fetch_assoc()) {
 
             
             
-            <div class='buttons'><a href='.php?action=add&id={$row['id']}' class='btn'>Lern More</a></div>
+            <div class='buttons'><a href='.php?action=add&id={$row['id']}' class='btn'>Lern More</a>
+            </div>
+            
               <div class='buttons'><a href='php/cart.php?action=add&id={$row['id']}' class='btn'>Add to Cart</a></div>
    
               </div>

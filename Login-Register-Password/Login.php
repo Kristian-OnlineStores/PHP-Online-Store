@@ -11,17 +11,48 @@
 <body>
       <div class="container">
         <div class="box form-box">
-            <?php 
+            <?php
+            
+
             session_start();
-             
+            
+            require_once  '../php/config/function.php';
               include("../php/Connect/connect.php");
+              
+              checkIfAlreadyLoggedIn();
+
               if(isset($_POST['submit'])){
-                $email = mysqli_real_escape_string($con,$_POST['email']);
+               $email = ($_POST['email']);
+                $password = ($_POST['password']);
+                
+                $result = LoginUser($email, $password, $con);
+                
+                
+                if (isset($result['error'])) {
+                   echo "<div class='message'>
+                            <p>{$result['error']}</p>
+                          </div><br>
+                          <a href='../Login-Register-Password/Login.php'><button class='btn'>Go Back</button></a>";
+                } else {
+        
+        if($result == 'admin') {
+            header("Location: ../Admin/index.php");
+        } else {
+            header("Location: ../home.php");
+        }
+        exit();
+    }/*if($result['Role'] == 'admin') {
+            header("Location: ../Admin/index.php");
+        } else {
+            header("Location: ../home.php");
+        }
+        exit();*/
+                
+ /*$email = mysqli_real_escape_string($con,$_POST['email']);
                 //$password = mysqli_real_escape_string($con,$_POST['password']);
                 $password = $_POST['password'];
                 $result = mysqli_query($con,"SELECT * FROM users WHERE Email='$email' ") or die("Select Error");
                 $row = mysqli_fetch_assoc($result);
-                
 
                 if(is_array($row) && !empty($row)){
 
@@ -29,7 +60,7 @@
     echo "<div class='message'>
                     <p>Your account has been banned. Please contact support for more information.</p>
                   </div><br>
-                  <a href='../Login-Register-Password/LoginIndex.php'><button class='btn'>Go Back</button></a>";  
+                  <a href='../Login-Register-Password/Login.php'><button class='btn'>Go Back</button></a>";  
 exit();
                   } 
 
@@ -88,7 +119,7 @@ exit();
                 if(isset($_SESSION['id'])){
                     header("Location: ../home.php");
                     exit();
-                }
+                }*/
               }else{
 
             
@@ -114,7 +145,8 @@ exit();
             </form>
             
         </div>
-        <?php } ?>
+        <?php } 
+        if(isset($con)) { $con->close(); }?>
       </div>
 </body>
 </html>

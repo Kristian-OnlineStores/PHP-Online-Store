@@ -28,7 +28,7 @@ if (isset($_POST['submit'])) {
         echo "<div class='message'>
                 <p>Request sent to email.</p>
               </div> <br>";
-              echo "<a href='../Login-Register-Password/LoginIndex.php'><button class='btn'>Go Back</button>";
+              echo "<a href='../Login-Register-Password/Login.php'><button class='btn'>Go Back</button>";
     } else {
         echo "<div class='message'>
                 <p>No user found with that email.</p>

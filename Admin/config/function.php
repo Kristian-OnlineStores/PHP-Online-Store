@@ -2,7 +2,8 @@
 session_start();
 
 //define('BASE_URL', '/PHP-Online Store/Admin/');
-require '../php/Connect/connect.php';
+//require '../php/Connect/connect.php';
+require_once __DIR__ . '/../../php/Connect/connect.php';
 
 function validate($inputData){
 
@@ -38,7 +39,7 @@ $query = "SELECT * FROM $tableName";
 
 function checkParamId($Id){
     if(isset($_GET[$Id])){
-        if ($_GET[$Id] != null) {
+        if ($_GET[$Id] != null && $_GET[$Id] != '') {
             return $_GET[$Id];
         }else{
             return 'No id found';
@@ -56,6 +57,8 @@ function getById($tableName, $userId){
     $query = "SELECT * FROM $tableName WHERE id='$userId' LIMIT 1";
     $result = mysqli_query($con, $query);
 
+
+    
     if ($result) {
           if(mysqli_num_rows($result) == 1){
        
@@ -85,21 +88,23 @@ function deleteQuery($tableName, $userId){
     return $result;
 }
 
-// В function.php - актуализирайте функцията
+
 function getBasePath() {
     $script_path = $_SERVER['SCRIPT_NAME'];
     
-    // Проверка дали сме в подпапка на Admin
-    if (preg_match('#/Admin/([^/]+)/#', $script_path, $matches)) {
+    
+    if (strpos($script_path, '/Admin/Users/') !== false) {
+        return '../';
+    }
+    
+    elseif (preg_match('#/Admin/([^/]+)/#', $script_path, $matches)) {
         $folder = $matches[1];
-        // Ако не сме в корена на Admin, връщаме '../'
-        if ($folder !== 'Admin' && $folder !== 'index.php') {
+        if ($folder !== 'index.php' && $folder !== '') {
             return '../';
         }
     }
     
-    // По подразбиране за Admin root
+    
     return '';
 }
-
 ?>

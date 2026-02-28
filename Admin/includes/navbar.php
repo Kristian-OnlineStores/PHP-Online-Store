@@ -1,12 +1,13 @@
 <?php
 //session_start();
- include("../php/Connect/connect.php");
-//require_once __DIR__ . '/../../php/Connect/connect.php';
+// include("../php/Connect/connect.php");
+require_once __DIR__ . '/../../php/Connect/connect.php';
 
 
 /**/if (!isset($_SESSION['id'])) {
-    header("Location: /../../Login-Register-Password/LoginIndex.php");
-    exit();
+   // header("Location: /../../Login-Register-Password/Login.php");
+   header("Location: /../../php/logout.php");
+   exit();
 }
 
 $id = $_SESSION['id'];

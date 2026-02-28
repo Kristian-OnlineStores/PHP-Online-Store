@@ -54,12 +54,23 @@ if ($check_admin->num_rows == 0) {
 
 $check_admin->close();*/
 
-$sql ="CREATE TABLE IF NOT EXISTS cars (
+
+
+
+
+
+
+
+
+
+$sql ="CREATE TABLE IF NOT EXISTS goods (
     id INT AUTO_INCREMENT PRIMARY KEY,
     brand VARCHAR(255) NOT NULL,
     model VARCHAR(255) NOT NULL,   
     year INT NOT NULL,
-    price DECIMAL(10, 2) NOT NULL
+    price DECIMAL(10, 2) NOT NULL,
+    IsOnSale TINYINT(1) DEFAULT 0,
+    CreatedAT TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )";
 if ($con->query($sql) === false) {
     echo "Error creating table: " . $con->error;
@@ -68,12 +79,12 @@ if ($con->query($sql) === false) {
 $sql ="CREATE TABLE IF NOT EXISTS cart (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
-    product_id INT,
+    goods_id INT,
     quantity INT DEFAULT 1,
     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
-    FOREIGN KEY (product_id) REFERENCES cars(id) ON DELETE SET NULL,
-    UNIQUE KEY unique_user_product (user_id, product_id)
+    FOREIGN KEY (goods_id) REFERENCES goods(id) ON DELETE SET NULL,
+    UNIQUE KEY unique_user_goods (user_id, goods_id)
 )";
 if ($con->query($sql) === false) {
     echo "Error creating table: " . $con->error;
@@ -82,12 +93,15 @@ if ($con->query($sql) === false) {
 $sql = "CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
+    
     total DECIMAL(10,2),
     payment_method VARCHAR(50),
     card_name VARCHAR(255),
     card_number VARCHAR(20),
     card_expiry VARCHAR(10),
     card_cvv VARCHAR(5),
+    order_status VARCHAR(50) DEFAULT 'Pending',
+    delivered TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 )";
@@ -95,16 +109,34 @@ if ($con->query($sql) === false) {
     echo "Error creating table: " . $con->error;
 } 
 
-$checkIfExistsQuery = "SELECT * FROM cars";
+$sql = "CREATE TABLE IF NOT EXISTS social_media (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(255) NOT NULL,
+    Url VARCHAR(255) NOT NULL,
+    Media_Status TINYINT(1) DEFAULT 1,
+    Created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)";
+if ($con->query($sql) === false) {
+    echo "Error creating table: " . $con->error;
+} 
+
+
+
+
+
+
+
+
+$checkIfExistsQuery = "SELECT * FROM goods";
 $result = $con->query($checkIfExistsQuery);
 
 if ($result->num_rows === 0) {
     
-    $insertQuery = "INSERT INTO cars (brand, model,  year, price) VALUES
-    ('Ford', 'Mustang', 2022, 45000.00),
-    ('Dacia', 'Duster', 2020, 35720.00),
-    ('Honda', 'Civic', 2023, 23000.00),
-    ('Toyota', 'Corolla', 2022, 25500.00)"; 
+    $insertQuery = "INSERT INTO goods (brand, model,  year, price, IsOnSale) VALUES
+    ('Ford', 'Mustang', 2022, 45000.00, 0),
+    ('Dacia', 'Duster', 2020, 35720.00, 1),
+    ('Honda', 'Civic', 2023, 23000.00, 1),
+    ('Toyota', 'Corolla', 2022, 25500.00, 1)"; 
     
     
     if ($con->query($insertQuery) === false) {

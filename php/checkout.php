@@ -1,10 +1,10 @@
 <?php
 
 session_start();
-include("php/connect.php");
+include("Connect/connect.php");
 
 if(!isset($_SESSION['valid']) || empty($_SESSION['cart'])){
-    header("Location: LoginIndex.php");
+    header("Location: Login.php");
     exit();
 }
 
@@ -42,12 +42,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $total += $item['price'] * $item['quantity'];
     }
     
-
-    if (strlen($card_number) < 16 || !is_numeric($card_number)) {
+$clean_card_number = str_replace(' ', '', $card_number);
+    if (strlen($clean_card_number) != 16 || !is_numeric($clean_card_number)) {
         $error_message = "Invalid card number";
     } elseif (strlen($card_cvv) < 3 || !is_numeric($card_cvv)) {
         $error_message = "Invalid CVV";
-    } else {
+    } elseif (!preg_match('/^(0[1-9]|1[0-2])\/([0-9]{2})$/', $card_expiry)) {
+    $error_message = "Invalid expiry date - must be MM/YY";
+}else {
 
         
         
@@ -74,12 +76,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout</title>
-    <link rel="stylesheet" href="assets/style/style.css">
+    <link rel="stylesheet" href="../assets/style/style.css">
 </head>
 <body>
     <div class="nav">
         <div class="logo">
-            <p><a href="home.php"><img src="assets/img/Logo.png" alt="No img" width="60" height="50"></a></p>
+            <p><a href="home.php"><img src="../assets/img/Logo.png" alt="No img" width="60" height="50"></a></p>
         </div>
 
         <div class="right-links">
@@ -89,9 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <button class="dropbtn"> <b><?php echo $res_FirstName . ' ' . $res_LastName; ?></b></button>
                 <div class="dropdown-content">
                     <a href="update.php?Id=<?php echo $res_id; ?>">Update Profile</a>
-                    <a href="php/logout.php">Log Out</a>
+                    <a href="logout.php">Log Out</a>
                 </div>
             </div>
+            
         </div>
     </div>
 
@@ -103,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <h3>Payment Successful!</h3>
                 <p>Thank you for your purchase. Your order has been placed successfully.</p>
                 <p>Order ID: #<?php echo $order_id; ?></p>
-                <a href="home.php" class="btn">Continue Shopping</a>
+                <a href="../home.php" class="btn">Continue Shopping</a>
             </div>
         <?php else: ?>
             <?php if (!empty($error_message)): ?>
@@ -149,17 +152,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 
                 <div class="form-group">
                     <label for="card_number">Card Number</label>
-                    <input type="text" name="card_number" id="card_number" placeholder="1234 5678 9012 3456" required>
+                    <input type="text" name="card_number" id="card_number" placeholder="1234 5678 9012 3456" pattern="[0-9\s]{16,19}"  maxlength="19" 
+                     oninput="this.value = this.value.replace(/[^0-9\s]/g, '').replace(/(\d{4})(?=\d)/g, '$1 ').trim()" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="card_expiry">Expiry Date</label>
-                    <input type="text" name="card_expiry" id="card_expiry" placeholder="MM/YY" required>
+                    <input type="text" name="card_expiry" id="card_expiry" placeholder="MM/YY"  pattern="(0[1-9]|1[0-2])\/([0-9]{2})" maxlength="5" 
+                     oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\d{2})(?=\d)/g, '$1/').trim()" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="card_cvv">CVV</label>
-                    <input type="text" name="card_cvv" id="card_cvv" placeholder="123" required>
+                    <input type="text" name="card_cvv" id="card_cvv" placeholder="123" maxlength="3" 
+                     oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 3)" required>
                 </div>
                 
                 <div class="form-group full-width">

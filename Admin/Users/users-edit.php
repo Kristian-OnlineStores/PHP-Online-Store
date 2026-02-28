@@ -1,5 +1,7 @@
-    <?php include('includes/header.php'); 
+    <?php //include('includes/header.php'); 
+    require_once __DIR__ . '/../config/function.php';
     
+    require_once __DIR__ . '/../includes/header.php';
     ?>
 
 <div class="row">
@@ -7,7 +9,7 @@
         <div class="card">
             <div class="card-header">
                 <h4>
-                    Add User
+                    Edit User
                     <a href="users.php" class="btn btn-danger float-end">Back</a>
                 </h4>
             </div>
@@ -15,7 +17,7 @@
 
                     <?= alertMessage(); ?>
 
-                <form action="code.php" method="POST">
+                <form action="../code.php" method="POST">
                     
                     <?php
                 $ParamResult = checkParamId('id');
@@ -52,7 +54,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label>Password</label>
-                                <input type="password" name="password" placeholder="Leave empty to keep current password" class="form-control">
+                                <input type="password" name="password" id="passwordField" placeholder="Leave empty to keep current password" class="form-control">
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -102,6 +104,6 @@
     </div>
 </div>
 
-<?php include('includes/footer.php'); 
-
+<?php //include('includes/footer.php'); 
+require_once __DIR__ . '/../includes/footer.php';
 ?>

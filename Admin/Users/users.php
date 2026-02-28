@@ -1,6 +1,6 @@
 <?php 
-include('../Admin/includes/header.php');
-//require_once __DIR__ . '/../includes/header.php';
+//include('../includes/header.php');
+require_once __DIR__ . '/../includes/header.php';
 ?>
 
 <div class="row">
@@ -16,7 +16,7 @@ include('../Admin/includes/header.php');
 
            <?= alertMessage(); ?>
 
-                <div class="table-responsive"> <!-- Премахнете затварящия div тук -->
+                <div class="table-responsive"> 
                     <table class="table table-bordered table-striped user-table">
                         <thead>
                             <tr>
@@ -64,14 +64,14 @@ include('../Admin/includes/header.php');
                             ?>
                         </tbody>
                     </table>
-                </div> <!-- Добавете затварящ div тук -->
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <?php 
-include('includes/footer.php');
-//require_once __DIR__ . '/../includes/footer.php';
+//include('includes/footer.php');
+require_once __DIR__ . '/../includes/footer.php';
 
 ?>
