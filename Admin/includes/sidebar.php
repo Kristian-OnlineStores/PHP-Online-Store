@@ -42,7 +42,7 @@ $base_url = getBasePath();
         <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Manage Services</h6>
       </li>
       <li class="nav-item">
-        <a class="nav-link  " href="<?= $base_url ?>services.php">
+        <a class="nav-link  " href="<?= $base_url ?>Service/services.php">
           <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
             <i class="fa-solid fa-gears text-dark fs-5"></i>
           </div>
@@ -79,12 +79,22 @@ $base_url = getBasePath();
           <span class="nav-link-text ms-1">Peoples Carts</span>
         </a>
       </li>
+
       <li class="nav-item">
         <a class="nav-link" href="<?= $base_url ?>Orders/orders.php">
           <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
             <i class="fa-solid fa-clipboard-list text-dark fs-5"></i><!--<i class="fa-solid fa-truck text-dark fs-5"></i>-->
           </div>
           <span class="nav-link-text ms-1">Orders</span>
+        </a>
+      </li>
+
+           <li class="nav-item">
+        <a class="nav-link" href="<?= $base_url ?>Ordered_Items/orderedItems.php">
+          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+            <i class="fa-regular fa-clipboard text-dark fs-5"></i>
+          </div>
+          <span class="nav-link-text ms-1">Ordered Items</span>
         </a>
       </li>
 

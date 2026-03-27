@@ -225,18 +225,18 @@ $query->close();*/
                         <?php 
                         $total = CartTotal($_SESSION['cart']);
                         foreach ($_SESSION['cart'] as $id => $item): 
-                            $item_total = $item['price'] * $item['quantity'];
+                            $item_total = $item['finalPrice'] * $item['quantity'];
                             
                         ?>
                         <tr>
                             <td><?php echo $item['brand'] . ' ' . $item['model']; ?></td>
-                            <td><?php echo number_format($item['price'], 2); ?> lv</td>
+                            <td><?php echo number_format($item['finalPrice'], 2); ?> €</td>
                             <td>
                                 <input type="number" name="quantities[<?php echo $id; ?>]" 
                                        value="<?php echo $item['quantity']; ?>" 
                                        min="1" class="quantity-input">
                             </td>
-                            <td><?php echo number_format($item_total, 2); ?> lv</td>
+                            <td><?php echo number_format($item_total, 2); ?> €</td>
                             <td>
                                 <a href="cart.php?action=remove&id=<?php echo $id; ?>">Remove</a>
                             </td>
@@ -246,7 +246,7 @@ $query->close();*/
                 </table>
                 
                 <div class="cart-total">
-                    Total: <?php echo number_format($total, 2); ?> lv
+                    Total: <?php echo number_format($total, 2); ?> €
                 </div>
                 
                 <div style="display: flex; justify-content: space-between;">

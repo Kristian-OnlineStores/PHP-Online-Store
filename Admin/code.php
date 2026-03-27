@@ -2,7 +2,7 @@
 //require 'config/function.php';
 require_once __DIR__ . '/config/function.php';
 
-         //////// Users ////////
+                //////////////// Users ////////////////
 
 if (isset($_POST['saveUser'])) 
     {
@@ -57,7 +57,6 @@ $userId = validate($_POST['userId']);
     {
 
    if (!empty($Password)) {
-    // If a new password is provided
     $PasswordHSH = password_hash($Password, PASSWORD_DEFAULT);
 
     $query = "UPDATE users SET 
@@ -69,7 +68,6 @@ $userId = validate($_POST['userId']);
         IsBan='$IsBan'
         WHERE id='$userId'";
 } else {
-    // If no new password is provided, keep the existing password
     $query = "UPDATE users SET 
         FirstName='$FirstName',
         LastName='$LastName',
@@ -93,31 +91,43 @@ $userId = validate($_POST['userId']);
     }
 }
 
-         //////// Products ////////
+                         ////////////////////////End Users ////////////////////////
 
-if (isset($_POST['saveProduct'])) {
+                             //////////////////////// Products ////////////////////////
+
+if(isset($_POST['saveProduct'])) {
     $brand = validate($_POST['brand']);
     $model = validate($_POST['model']);
     $year = validate($_POST['year']);
     $price = validate($_POST['price']);
-    $IsOnSale = isset($_POST['IsOnSale']) ? 1 : 0;
     
-
-    if ($brand != '' && $model != '' && $year != '' && $price != '') {
-        $query = "INSERT INTO goods (brand, model, year, price, IsOnSale) VALUES ('$brand', '$model', '$year', '$price', '$IsOnSale')";
-        $result = mysqli_query($con, $query);
-
-        if ($result) {
-            redirect('Products/goods.php', 'Product Created Successfully');
-        } else {
-            redirect('Products/goods-create.php', 'Something Went Wrong');
-        }
+    $sale_status = isset($_POST['saleCheckbox']) ? 1 : 0;
+    //$sale_status = isset($_POST['Sale']) ? validate($_POST['Sale']) : 0;
+   
+    if($sale_status == 1 && isset($_POST['discountPercent']) && $_POST['discountPercent'] != '') {
+        $discount_percent = validate($_POST['discountPercent']);
+        //$final_price = validate($_POST['finalPrice']);
+        $final_price = $price - ($price * $discount_percent / 100);
     } else {
-        redirect('Products/goods-create.php', 'Please fill all input fields');
+        $discount_percent = 'NULL';
+        $final_price = $price;
+        $sale_status = 0; 
     }
-
-    if ($IsOnSale){
-        
+    
+    if($discount_percent == 'NULL') {
+        $query = "INSERT INTO goods (brand, model, year, price, saleStatus, discountPercent, finalPrice) 
+                  VALUES ('$brand', '$model', '$year', '$price', '$sale_status', NULL, '$final_price')";
+    } else {
+        $query = "INSERT INTO goods (brand, model, year, price, saleStatus, discountPercent, finalPrice) 
+                  VALUES ('$brand', '$model', '$year', '$price', '$sale_status', '$discount_percent', '$final_price')";
+    }
+    
+    $result = mysqli_query($con, $query);
+    
+    if($result) {
+        redirect('Products/products.php', 'Product added successfully!');
+    } else {
+        redirect('goods-create.php', 'Something went wrong!');
     }
 }
 
@@ -126,11 +136,23 @@ if (isset($_POST['updateProduct'])) {
     $model = validate($_POST['model']);
     $year = validate($_POST['year']);
     $price = validate($_POST['price']);
-    $IsOnSale = isset($_POST['IsOnSale']) == true? 1 : 0;
-    $productId = validate($_POST['productId']);
+    $sale_status = isset($_POST['saleCheckbox']) ? 1 : 0;
+
+    $discount_percent = !empty($_POST['discountPercent']) ? validate($_POST['discountPercent']) : null;
+
+    $final_price = null;
+    if ($sale_status == 1 && $discount_percent !== null && $discount_percent > 0) {
+        $final_price = $price - ($price * $discount_percent / 100);
+    }else {
+        $final_price = $price;
+        $sale_status = 0; 
+    }   
+
+    $productId = validate($_POST['goodsId']);
 
     if ($brand != '' && $model != '' && $year != '' && $price != '') {
-        $query = "UPDATE goods SET brand='$brand', model='$model', year='$year', price='$price', IsOnSale='$IsOnSale' WHERE id='$productId'";
+        $query = "UPDATE goods SET brand='$brand', model='$model', year='$year', price='$price', saleStatus='$sale_status',  discountPercent=" . ($discount_percent !== null ? "'$discount_percent'" : "NULL") . ",
+                    finalPrice=" . ($final_price !== null ? "'$final_price'" : "NULL") . "  WHERE id='$productId'";
         $result = mysqli_query($con, $query);
 
         if ($result) {
@@ -143,20 +165,26 @@ if (isset($_POST['updateProduct'])) {
     }
 }
 
-         //////// Orders ////////
+                 ////////////////End Products ////////////////
 
-if (isset($_POST['saveOrders'])) {
-    $user_id = validate($_POST['user_id']);
+                   //////////////// Orders ////////////////
+
+if (isset($_POST['saveOrder'])) {
+    $user_id = validate($_POST['userId']);
     $total = validate($_POST['total']);
-    $payment_method = validate($_POST['payment_method']);
-    $card_name = validate($_POST['card_name']);
-    $card_number = validate($_POST['card_number']);
-    $card_expiry = validate($_POST['card_expiry']);
-    $card_cvv = validate($_POST['card_cvv']);
-    $order_status = validate($_POST['order_status']);
+    $payment_method = validate($_POST['paymentMethod']);
+    $card_name = validate($_POST['cardName']);
+    $card_number = validate($_POST['cardNumber']);
+    $card_expiry = validate($_POST['cardExpiry']);
+    $card_cvv = validate($_POST['cardCvv']);
+    $paid = isset($_POST['paid']) ? 1 : 0;
+    $order_status = validate($_POST['orderStatus']);
 
-    if ($user_id != '' && $total != '' && $payment_method != '' && $card_name != '' && $card_number != '' && $card_expiry != '' && $card_cvv != '' && $order_status != '') {
-        $query = "INSERT INTO orders (user_id, total, payment_method, card_name, card_number, card_expiry, card_cvv, order_status) VALUES ('$user_id', '$total', '$payment_method', '$card_name', '$card_number', '$card_expiry', '$card_cvv', '$order_status')";
+
+
+    if ($user_id != '' && $total != '' && $payment_method != '' && $card_name != '' && $card_number != '' && $card_expiry != '' && $card_cvv != ''  && $order_status != '') {
+        $query = "INSERT INTO orders (user_id, total, paymentMethod, cardName, cardNumber, cardExpiry, cardCvv, paid, orderStatus) VALUES 
+                                   ('$user_id', '$total', '$payment_method', '$card_name', '$card_number', '$card_expiry', '$card_cvv', '$paid', '$order_status')";
         $result = mysqli_query($con, $query);
 
         if ($result) {
@@ -169,21 +197,29 @@ if (isset($_POST['saveOrders'])) {
     }
 }   
 
-if(isset($_POST['updateOrders'])) {
-    $user_id = validate($_POST['user_id']);
+if(isset($_POST['updateOrder'])) {
+    $user_id = validate($_POST['userId']);
     $total = validate($_POST['total']);
-    $payment_method = validate($_POST['payment_method']);
-    $card_name = validate($_POST['card_name']);
-    $card_number = validate($_POST['card_number']);
-    $card_expiry = validate($_POST['card_expiry']);
-    $card_cvv = validate($_POST['card_cvv']);
-    $order_status = validate($_POST['order_status']);
-    $orderId = validate($_POST['orderId']);
+    $payment_method = validate($_POST['paymentMethod']);
+    $card_name = validate($_POST['cardName']);
+    $card_number = validate($_POST['cardNumber']);
+    $card_expiry = validate($_POST['cardExpiry']);
+    $card_cvv = validate($_POST['cardCvv']);
+    $paid = isset($_POST['paid']) ? 1 : 0;
+    $order_status = validate($_POST['orderStatus']);
 
-    if ($user_id != '' && $total != '' && $payment_method != '' && $card_name != '' && $card_number != '' && $card_expiry != '' && $card_cvv != '' && $order_status != '') {
-        $query = "UPDATE orders SET user_id='$user_id', total='$total', payment_method='$payment_method', card_name='$card_name', card_number='$card_number', card_expiry='$card_expiry', card_cvv='$card_cvv', order_status='$order_status' WHERE id='$orderId'";
+    $orderId = validate($_POST['orderId']);
+  $order = getById('orders', $orderId);
+  
+  if ($order['status'] != 200) {
+    redirect('Orders/orders-edit.php?id='.$orderId, 'No such order found');
+  }
+    
+    if ($user_id != '' && $total != '' && $payment_method != '' && $card_name != '' && $card_number != '' && $card_expiry != '' && $card_cvv != ''  && $order_status != '') {
+        $query = "UPDATE orders SET user_id='$user_id', total='$total', paymentMethod='$payment_method', cardName='$card_name', cardNumber='$card_number', cardExpiry='$card_expiry', cardCvv='$card_cvv', paid='$paid', orderStatus='$order_status' WHERE id='$orderId'";
         $result = mysqli_query($con, $query);
 
+        
         if ($result) {
             redirect('Orders/orders.php', 'Order Updated Successfully');
         } else {
@@ -194,7 +230,54 @@ if(isset($_POST['updateOrders'])) {
     }
 }
 
-            //////// Social Media ////////  
+                ////////////////End Orders ////////////////
+
+                   ////////////////Ordered Items ////////////////
+
+    if(isset($_POST['saveOrderedItem'])) {
+    $order_id = mysqli_real_escape_string($conn, $_POST['order_id']);
+    $goods_id = mysqli_real_escape_string($conn, $_POST['goods_id']);
+    $quantity = mysqli_real_escape_string($conn, $_POST['quantity']);
+    $price = mysqli_real_escape_string($conn, $_POST['price']);
+    
+    if($order_id != '' && $goods_id != '' && $quantity != '' && $price != '') {
+    $query = "INSERT INTO orderedItems (order_id, goods_id, quantity, price) VALUES ('$order_id', '$goods_id', '$quantity', '$price')";
+    
+    $result = mysqli_query($con, $query);
+    
+    if($result) {
+        redirect('Ordered_Items/orderedItems.php', 'Ordered Item added successfully.');
+    } else {
+        redirect('Ordered_Items/orderedItems-create.php', 'Something went wrong.');
+    }
+}else {
+        redirect('Ordered_Items/orderedItems-create.php', 'Please fill all input fields');
+    }
+}
+
+if (isset($_POST['updateOrderedItem'])) {
+    $order_id = mysqli_real_escape_string($conn, $_POST['order_id']);
+    $goods_id = mysqli_real_escape_string($conn, $_POST['goods_id']);
+    $quantity = mysqli_real_escape_string($conn, $_POST['quantity']);
+    $price = mysqli_real_escape_string($conn, $_POST['price']);
+
+    $orderedItemId = mysqli_real_escape_string($conn, $_POST['orderedItemId']);
+
+    if ($order_id != '' && $goods_id != '' && $quantity != '' && $price != '') {
+        $query = "UPDATE orderedItems SET order_id='$order_id', goods_id='$goods_id', quantity='$quantity', price='$price' WHERE id='$orderedItemId'";
+        $result = mysqli_query($con, $query);
+
+        if ($result) {
+            redirect('Ordered_Items/orderedItems.php', 'Ordered Item Updated Successfully');
+        } else {
+            redirect('Ordered_Items/orderedItems-edit.php?id='.$orderedItemId, 'Something Went Wrong');
+        }
+    } else {
+        redirect('Ordered_Items/orderedItems-edit.php?id='.$orderedItemId, 'Please fill all input fields');
+    }
+}
+
+                   //////////////////////// Social Media ////////////////// 
 
 if (isset($_POST['saveSocialMedia'])) {
     $name = validate($_POST['name']);

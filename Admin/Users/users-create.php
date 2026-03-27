@@ -41,13 +41,14 @@
                                     <input type="password" name="password" class="form-control" required>
                                 </div>
                             </div>
-                              <div class="col-md-3">
+
+                            <div class="col-md-3">
                             <div class="mb-3">
                                 <label>Select Role</label>
                                 <select name="role" required class="form-select">
                                     <option value="">Select Role</option>
-                                    <option value="admin" <?= $user['data']['Role'] == 'admin' ? 'selected' : '' ;?>>Admin</option>
-                                    <option value="user" <?= $user['data']['Role'] == 'user' ? 'selected' : '' ;?>>User</option>
+                                    <option value="Admin">Admin</option>
+                                    <option value="User">User</option>
                                 </select>
                             </div>
                         </div>
@@ -59,8 +60,8 @@
                                     <input type="checkbox" name="is_ban" value="1" style="width:30px; height: 30px" />
                                 </div>
                             </div>
+                            
                             <div class="col-md-6">
-
                                 <div class="b-3 text-end">
                                     <br>
                                     <button type="submit" name="saveUser" class="btn btn-primary">Save</button>

@@ -4,21 +4,21 @@ require '../config/function.php';
 $parameter = checkParamId('id');
 if (is_numeric($parameter)) {
 
-    $productId = validate($parameter);
+    $orderId = validate($parameter);
 
-    $product = getById('orders', $productId);
-    if ($product['status'] == 200) {
+    $order = getById('orders', $orderId);
+    if ($order['status'] == 200) {
 
-        $deleteQuery = deleteQuery('orders', $productId);
+        $deleteQuery = deleteQuery('orders', $orderId);
 
         if ($deleteQuery) {
 
-            redirect('orders.php', 'Product Deleted Successfully');
+            redirect('orders.php', 'Order Deleted Successfully');
         } else {
             redirect('orders.php', 'Something Went Wrong');
         }
     } else {
-        redirect('orders.php', $user['message']);
+        redirect('orders.php', $order['message']);
     }
 } else {
     redirect('orders.php', $parameter);

@@ -380,3 +380,23 @@ main{
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+
+                        
+.cars-container{
+display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 0 0px;
+    margin: 20px;
+    justify-items: center;
+    margin: 0;
+}
+
+.cars-conntent{
+    border: 1px solid #ccc;
+    background-color: white;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}

@@ -48,23 +48,65 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label>Year</label>
-                                <input type="number" value="<?= $goods['data']['year'] ;?>" name="year" required class="form-control">
+                               <select name="year" id="year" class="form-control" required>
+                                    <option value="">Select Year</option>
+                                    <?php 
+                                    $currentYear = date('Y');
+                                    for($y = $currentYear; $y >= 1900; $y--): 
+                                    ?>
+                                        <option value="<?= $y; ?>" <?= ($goods['data']['year'] == $y) ? 'selected' : ''; ?>>
+                                            <?= $y; ?>
+                                        </option>
+                                    <?php endfor; ?>
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label>Price</label>
-                                    <input type="number" value="<?= $goods['data']['price'] ;?>" name="price" class="form-control" required>
+                                 <label>Original Price</label>
+                                <input type="number" step="0.01" name="price" id="originalPrice" value="<?= $goods['data']['price']; ?>" class="form-control" required>
                             </div>
                         </div>
 
-                        <div class="col-md-3">
+                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label>Is on Sale</label>
-                                <br>
-                                <input type="checkbox" <?= $goods['data']['IsOnSale'] == 1 ? 'checked' : '' ;?> name="is_sale" style="width:30px; height: 30px" />
+                                <label>Sale Status</label>
+                                <br/>
+                                <input type="checkbox" name="saleCheckbox" id="saleCheckbox" value="1" 
+                                    style="width:30px; height: 30px" 
+                                    <?= ($goods['data']['saleStatus'] == 1) ? 'checked' : ''; ?>
+                                    onclick="toggleDiscountField()"/>
                             </div>
                         </div>
+                        
+                        <div class="col-md-3" style="display: <?= ($goods['data']['saleStatus'] == 1 && $goods['data']['discountPercent'] > 0) ? 'block' : 'none'; ?>;" id="discountField">
+                            <div class="mb-3">
+                                <label>Discount Percent</label>
+                                <select name="discountPercent" id="discountPercent" class="form-select" onchange="calculateNewPrice()">
+                                    <option value="">Select Discount</option>
+                                    <?php for($i = 0; $i <= 90; $i += 5): ?>
+                                        <option value="<?= $i; ?>" <?= ($goods['data']['discountPercent'] == $i) ? 'selected' : ''; ?>>
+                                            <?= $i; ?>% off
+                                        </option>
+                                    <?php endfor; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3" style="display: <?= ($goods['data']['saleStatus'] == 1 && $goods['data']['discountPercent'] > 0) ? 'block' : 'none'; ?>;" id="pricePreview">
+                            <div class="mb-3">
+                                <label>New Price</label>
+                                <div id="finalPrice" style="font-size: 15px; font-weight: bold; ">
+                                    <?php 
+                                    if($goods['data']['saleStatus'] == 1 && $goods['data']['discountPercent'] > 0) {
+                                        $newPrice = $goods['data']['price'] - ($goods['data']['price'] * $goods['data']['discountPercent'] / 100);
+                                        echo number_format($newPrice, 2) . ' BGN';
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="col-md-6">
 
                             <div class="b-3 text-end">
@@ -94,7 +136,7 @@
         </div>
     </div>
 </div>
-
+ <script src="../config/function.js"></script>
 <?php //include('includes/footer.php'); 
 require_once __DIR__ . '/../includes/footer.php';
 ?>

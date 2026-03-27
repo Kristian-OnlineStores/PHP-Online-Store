@@ -1,5 +1,4 @@
 <?php
-
 function validate($input) {
     return trim(htmlspecialchars($input));
 }
@@ -11,7 +10,7 @@ function normalizeEmail($email) {
 
 function loadUserCart($con, $user_id) {
     $cart_query = $con->prepare("   
-        SELECT c.goods_id, c.quantity, g.brand, g.model, g.price
+        SELECT c.goods_id, c.quantity, g.brand, g.model, g.finalPrice
         FROM cart c
         INNER JOIN goods g ON c.goods_id = g.id
         WHERE c.user_id = ?
@@ -23,12 +22,12 @@ function loadUserCart($con, $user_id) {
     
     $_SESSION['cart'] = array();
     while($cart_item = $cart_result->fetch_assoc()){
-        // quantity идва от базата като ЧИСЛО!
+        
         $_SESSION['cart'][$cart_item['goods_id']] = array(
             'brand' => $cart_item['brand'],
             'model' => $cart_item['model'],
-            'price' => $cart_item['price'],
-            'quantity' => intval($cart_item['quantity']) // ← УВЕРЕНИЕ, ЧЕ Е ЧИСЛО
+            'finalPrice' => $cart_item['finalPrice'],
+            'quantity' => intval($cart_item['quantity']) 
         );
     }
     $cart_query->close();
@@ -49,6 +48,9 @@ function syncCartWithDatabase($con, $user_id, $session_cart) {
         $insert_stmt->close();
     }
 }
+
+
+
 
 function LoginUser($email, $password, $con) {
     $email = normalizeEmail($email);
@@ -123,17 +125,17 @@ function RegisterUser($con, $data) {
     $password = $data['password'];
     $confirmPassword = $data['confirmPassword'];
     
-    // Проверка за празни полета
+    
     if(empty($firstName) || empty($lastName) || empty($email) || empty($password)) {
         return array('error' => 'Please fill all required fields');
     }
     
-    // Проверка на имейл формат
+    
     if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         return array('error' => 'Invalid email format');
     }
     
-    // Проверка на паролите
+    
     if($password !== $confirmPassword) {
         return array('error' => 'Passwords do not match');
     }
@@ -149,12 +151,12 @@ function RegisterUser($con, $data) {
     }
     $check_stmt->close();
     
-    // Хеширане на паролата
+    
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
     $role = 'user';
     $isBan = 0;
     
-    // Вмъкване в базата с prepared statement
+    
     $insert_stmt = $con->prepare("INSERT INTO users (FirstName, LastName, Email, Password, Role, IsBan) VALUES (?, ?, ?, ?, ?, ?)");
     $insert_stmt->bind_param("sssssi", $firstName, $lastName, $email, $hashedPassword, $role, $isBan);
     
@@ -167,12 +169,6 @@ function RegisterUser($con, $data) {
         return array('error' => 'Registration failed. Please try again.');
     }
 }
-
-
-
-
-
-
 
 
 function isLoggedIn() {
@@ -216,9 +212,14 @@ function logoutUser() {
 
 
 
+
+
+                    /////////// Cart functions //////////
+
+
 function AddToCart($con, $user_id, $goods_id) {
     // Вземи информация за продукта
-    $goods_query = $con->prepare("SELECT brand, model, price FROM goods WHERE id = ?");
+    $goods_query = $con->prepare("SELECT brand, model, finalPrice FROM goods WHERE id = ?");
     $goods_query->bind_param("i", $goods_id);
     $goods_query->execute();
     $goods_result = $goods_query->get_result();
@@ -230,19 +231,18 @@ function AddToCart($con, $user_id, $goods_id) {
     $goods = $goods_result->fetch_assoc();
     $goods_query->close();
     
-    // Добави/обнови в сесията - quantity е ЧИСЛО!
+
     if (isset($_SESSION['cart'][$goods_id])) {
-        $_SESSION['cart'][$goods_id]['quantity'] += 1; // ЧИСЛО + 1 = ЧИСЛО
+        $_SESSION['cart'][$goods_id]['quantity'] += 1; 
     } else {
         $_SESSION['cart'][$goods_id] = array(
             'brand' => $goods['brand'],
             'model' => $goods['model'],
-            'price' => $goods['price'],
-            'quantity' => 1 // ← ЧИСЛО, НЕ МАСИВ!
+            'finalPrice' => $goods['finalPrice'], 
+            'quantity' => 1 
         );
     }
     
-    // Синхронизирай с базата
     syncCartWithDatabase($con, $user_id, $_SESSION['cart']);
     
     return array('success' => true);
@@ -252,13 +252,13 @@ function UpdateCart($con, $user_id, $quantities) {
     // $quantities идва от POST: ["52" => "2", "1" => "1"]
     foreach ($quantities as $goods_id => $quantity) {
         $goods_id = intval($goods_id);
-        $quantity = intval($quantity); // ← ПРЕВРЪЩАМЕ В ЧИСЛО!
+        $quantity = intval($quantity);
         
         if ($quantity <= 0) {
             unset($_SESSION['cart'][$goods_id]);
         } else {
             if (isset($_SESSION['cart'][$goods_id])) {
-                $_SESSION['cart'][$goods_id]['quantity'] = $quantity; // ← ЧИСЛО!
+                $_SESSION['cart'][$goods_id]['quantity'] = $quantity; 
             }
         }
     }
@@ -292,13 +292,229 @@ function CartTotal($cart) {
         return 0;
     }
     foreach ($cart as $item) {
-        if (!isset($item['price']) || !isset($item['quantity'])) {
+        if (!isset($item['finalPrice']) || !isset($item['quantity'])) {
             continue;
         }
-        $price = floatval($item['price']);
+        $price = floatval($item['finalPrice']);
         $quantity = is_numeric($item['quantity']) ? floatval($item['quantity']) : 0;
         $total += $price * $quantity;
     }
     return $total;
 }
+
+
+             ///////////End Cart functions ///////////
+
+               ////////////// Checkout functions /////////////
+
+
+function processPayment($con, $user_id, $cart, $data) {
+    $total = 0;
+    foreach ($cart as $item) {
+        $total += $item['finalPrice'] * $item['quantity'];
+    }
+   $validation = validateCheckoutData($data);
+
+    if (isset($validation['error'])){
+        return  [
+            'success' => false,
+            'error' => true,
+            'message' => $validation['message']
+        ];
+    }
+
+    $con->begin_transaction();
+    
+    try {
+        $ordered_id = insertOrder($con, $user_id, $total, $data);
+        
+        if (!$ordered_id) {
+            throw new Exception("Failed to insert order");
+        }
+        
+        $items_inserted = insertOrderItems($con, $ordered_id, $cart);
+        
+        if (!$items_inserted) {
+            throw new Exception("Failed to insert order items");
+        }
+        
+        $con->commit();
+        
+        return [
+            'success' => true,
+            'order_id' => $ordered_id,
+            'total' => $total,
+            'message' => 'Payment successful!'
+        ];
+        
+    } catch (Exception $e) {
+
+        $con->rollback();
+        return [
+            'success' => false, 
+            'error' => true,
+            'message' => 'Error processing your order: ' . $e->getMessage()
+        ];
+    }
+}
+
+function validateCheckoutData($data) {
+
+    $required_fields = ['cardName', 'cardNumber', 'cardExpiry', 'cardCvv', 'paymentMethod'];
+    foreach ($required_fields as $field) {
+        if (empty($data[$field])) {
+            return [
+                'error' => true,
+                'message' => "Please fill in all required fields"
+            ];
+
+            //return array('error' => "Please fill in all required fields");
+        }
+    }
+    
+    if (!preg_match('/^\d{16}$/', str_replace(' ', '', $data['cardNumber']))) {
+      return [
+                'error' => true,
+                'message' => "Invalid card number"
+            ];
+    // return array('error' => "Invalid card number");
+    }
+    
+    if (!preg_match('/^\d{3,4}$/', $data['cardCvv'])) {
+        return [
+                'error' => true,
+                'message' => "Invalid CVV"
+            ];
+       // return array('error' => "Invalid CVV");
+    }
+    
+    if (!preg_match('/^(0[1-9]|1[0-2])\/([0-9]{2})$/', $data['cardExpiry'], $matches)) {
+       return [
+                'error' => true,
+                'message' => "Invalid expiry date - must be MM/YY"
+            ];
+    // return array('error' => "Invalid expiry date - must be MM/YY");
+    }
+
+    $month = $matches[1];
+$year = $matches[2];
+
+$currentYear = date('y');
+$currentMonth = date('m');
+
+if ($year < $currentYear || ($year == $currentYear && $month < $currentMonth)) {
+    return array('error' => "Card has expired");
+}
+
+$maxFutureYears = 10; 
+if ($year > $currentYear + $maxFutureYears) {
+    return array('error' => "Invalid expiry year - too far in the future");
+}
+    
+    return array('success' => true);
+}
+
+function insertOrder($con, $user_id, $total, $payment_data) {
+    $query = "INSERT INTO orders (user_id, total, paymentMethod, cardName, cardNumber, cardExpiry, cardCvv, paid, orderStatus, created_at) 
+              VALUES (?, ?, ?, ?, ?, ?, ?, '1', 'Pending', NOW())";
+    
+    $stmt = $con->prepare($query);
+    $stmt->bind_param("idsssss", 
+        $user_id, 
+        $total, 
+        $payment_data['paymentMethod'], 
+        $payment_data['cardName'], 
+        $payment_data['cardNumber'], 
+        $payment_data['cardExpiry'], 
+        $payment_data['cardCvv'],
+
+    );
+    
+    if ($stmt->execute()) {
+        $order_id = $con->insert_id;
+        $stmt->close();
+        return $order_id;
+    }
+    
+    $stmt->close();
+    return false;
+}
+
+function insertOrderItems($con, $ordered_id, $cart) {
+    $query = "INSERT INTO orderedItems (order_id, goods_id, quantity, price) VALUES (?, ?, ?, ?)";
+    $stmt = $con->prepare($query);
+    
+    foreach ($cart as $goods_id => $item) {
+        $goods_id_int = intval($goods_id);
+        $quantity = intval($item['quantity']);
+        $price = floatval($item['finalPrice']);
+        
+        $stmt->bind_param("iiid", $ordered_id, $goods_id_int, $quantity, $price);
+        
+        if (!$stmt->execute()) {
+            $stmt->close();
+            return false;
+        }
+    }
+    
+    $stmt->close();
+    return true;
+}
+
+function clearCartAfterPayment() {
+    $_SESSION['cart'] = array();
+    return true;
+}
+
+function getOrderDetails($con, $order_id, $user_id = null) {
+    $query = "SELECT o.*, 
+              (SELECT COUNT(*) FROM orderedItems WHERE order_id = o.id) as item_count 
+              FROM orders o 
+              WHERE o.id = ?";
+    
+    if ($user_id !== null) {
+        $query .= " AND o.user_id = ?";
+        $stmt = $con->prepare($query);
+        $stmt->bind_param("ii", $order_id, $user_id);
+    } else {
+        $stmt = $con->prepare($query);
+        $stmt->bind_param("i", $order_id);
+    }
+    
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $order = $result->fetch_assoc();
+        
+        $items_query = "SELECT oi.*, g.brand, g.model 
+                        FROM orderedItems oi 
+                        JOIN goods g ON oi.goods_id = g.id 
+                        WHERE oi.order_id = ?";
+        $items_stmt = $con->prepare($items_query);
+        $items_stmt->bind_param("i", $order_id);
+        $items_stmt->execute();
+        $items_result = $items_stmt->get_result();
+        
+        $order['items'] = [];
+        while ($item = $items_result->fetch_assoc()) {
+            $order['items'][] = $item;
+        }
+        
+        $items_stmt->close();
+        $stmt->close();
+        
+        return [
+            'success' => true,
+            'order' => $order
+        ];
+    }
+    
+    $stmt->close();
+    return [
+        'success' => false,
+        'message' => 'Order not found'
+    ];
+}
+
 ?>

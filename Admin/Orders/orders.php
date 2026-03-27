@@ -29,28 +29,47 @@ require_once __DIR__ . '/../includes/header.php';
                 <th>Card Expiry</th>
                 <th>Card CVV</th>
                 <th>Payed</th>
-                <th>Delivered</th>
+                <th>Order Status</th>
                 <th>Action</th>
             </tr>
         </thead>
         <tbody>
             <?php 
-            $cars = getAll('orders');
-            if(mysqli_num_rows($cars) > 0){
-                foreach($cars as $item){
+            $orders = getAll('orders');
+            if(mysqli_num_rows($orders) > 0){
+                foreach($orders as $item){
                     ?>
                     
                     <tr class="Information">
     <td data-label="Id"><?= $item['id']; ?></td>
     <td data-label="User"><?= $item['user_id']; ?></td>
     <td data-label="Total"><?= $item['total']; ?></td>
-    <td data-label="Payment Method"><?= $item['payment_method']; ?></td>
-    <td data-label="Card Name"><?= $item['card_name']; ?></td>
-    <td data-label="Card Number"><?= $item['card_number']; ?></td>
-    <td data-label="Card Expiry"><?= $item['card_expiry']; ?></td>
-    <td data-label="Card CVV"><?= $item['card_cvv']; ?></td>
-    <td data-label="Payed"><?= $item['order_status'] == 0 ? 'Pending' : 'Paid'; ?></td>
-    <td data-label="Delivered"><?= $item['delivered'] == 0 ? 'Not Delivered' : 'Delivered'; ?></td>      
+    <td data-label="Payment Method"><?= $item['paymentMethod']; ?></td>
+    <td data-label="Card Name"><?= $item['cardName']; ?></td>
+    <td data-label="Card Number"><?= $item['cardNumber']; ?></td>
+    <td data-label="Card Expiry"><?= $item['cardExpiry']; ?></td>
+    <td data-label="Card CVV"><?= $item['cardCvv']; ?></td>
+    <td data-label="Payed"><?= $item['paid'] == 0 ? 'Pending' : 'Paid'; ?></td>
+ <td data-label="Status">
+    <?php 
+    switch($item['orderStatus']) {
+        case 'Pending':
+            echo '<span class="badge bg-warning">Pending</span>';
+            break;
+        case 'Processing':
+            echo '<span class="badge bg-info">Processing</span>';
+            break;
+        case 'Completed':
+            echo '<span class="badge bg-success">Completed</span>';
+            break;
+        case 'Cancelled':
+            echo '<span class="badge bg-danger">Cancelled</span>';
+            break;
+        default:
+            echo '<span class="badge bg-secondary">Unknown</span>';
+    }
+    ?>
+</td>  
 
     <td data-label="Action">
         <a href="orders-edit.php?id=<?= $item['id']; ?>" class="btn btn-success btn-sm">Edit</a>

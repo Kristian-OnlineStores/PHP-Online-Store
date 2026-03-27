@@ -62,14 +62,15 @@ $check_admin->close();*/
 
 
 
-
-$sql ="CREATE TABLE IF NOT EXISTS goods (
+$sql = "CREATE TABLE IF NOT EXISTS goods (
     id INT AUTO_INCREMENT PRIMARY KEY,
     brand VARCHAR(255) NOT NULL,
     model VARCHAR(255) NOT NULL,   
     year INT NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
-    IsOnSale TINYINT(1) DEFAULT 0,
+    saleStatus TINYINT(1) DEFAULT 0,
+    discountPercent INT DEFAULT NULL,
+    finalPrice DECIMAL(10, 2),
     CreatedAT TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )";
 if ($con->query($sql) === false) {
@@ -95,15 +96,29 @@ $sql = "CREATE TABLE IF NOT EXISTS orders (
     user_id INT,
     
     total DECIMAL(10,2),
-    payment_method VARCHAR(50),
-    card_name VARCHAR(255),
-    card_number VARCHAR(20),
-    card_expiry VARCHAR(10),
-    card_cvv VARCHAR(5),
-    order_status VARCHAR(50) DEFAULT 'Pending',
-    delivered TINYINT(1) DEFAULT 0,
+    paymentMethod VARCHAR(255) NOT NULL,
+    cardName VARCHAR(255),
+    cardNumber VARCHAR(20),
+    cardExpiry VARCHAR(10),
+    cardCvv VARCHAR(5),
+    paid TINYINT(1) DEFAULT 0,
+    orderStatus VARCHAR(100) DEFAULT 'Pending' NOT NULL,
+    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+)";
+if ($con->query($sql) === false) {
+    echo "Error creating table: " . $con->error;
+} 
+
+$sql = "CREATE TABLE IF NOT EXISTS orderedItems (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    goods_id INT NOT NULL,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (goods_id) REFERENCES goods(id)
 )";
 if ($con->query($sql) === false) {
     echo "Error creating table: " . $con->error;
@@ -132,11 +147,11 @@ $result = $con->query($checkIfExistsQuery);
 
 if ($result->num_rows === 0) {
     
-    $insertQuery = "INSERT INTO goods (brand, model,  year, price, IsOnSale) VALUES
-    ('Ford', 'Mustang', 2022, 45000.00, 0),
-    ('Dacia', 'Duster', 2020, 35720.00, 1),
-    ('Honda', 'Civic', 2023, 23000.00, 1),
-    ('Toyota', 'Corolla', 2022, 25500.00, 1)"; 
+    $insertQuery = "INSERT INTO goods (brand, model,  year, price, saleStatus, discountPercent, finalPrice) VALUES
+    ('Ford', 'Mustang', 2022, 45000.00, 0, NULL, 45000.00),
+    ('Dacia', 'Duster', 2020, 35720.00, 1, 15, 30362.00),
+    ('Honda', 'Civic', 2023, 23000.00, 1, 10, 20700.00),
+    ('Toyota', 'Corolla', 2022, 25500.00, 1, 20, 20400.00)"; 
     
     
     if ($con->query($insertQuery) === false) {
