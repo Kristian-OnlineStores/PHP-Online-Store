@@ -99,4 +99,3 @@ while ($row = $result->fetch_assoc()) {
 
 </body>
 </html>
-<!--<td>{$row['price']}</td>-->

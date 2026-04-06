@@ -17,7 +17,7 @@ require_once __DIR__ . '/../includes/header.php';
            <?= alertMessage(); ?>
 
                 <div class="table-responsive"> 
-                    <table class="table table-bordered table-striped user-table">
+                    <table id="myTable" class="table table-bordered table-striped user-table">
                         <thead>
                             <tr>
                                 <th>Id</th>
@@ -29,7 +29,7 @@ require_once __DIR__ . '/../includes/header.php';
                         </thead>
                         <tbody>
                           
-                        </tbody>
+                        
                         <?php 
                             $socialMedia = getAll('social_media');
                             if($socialMedia && mysqli_num_rows($socialMedia) > 0){
@@ -60,6 +60,7 @@ require_once __DIR__ . '/../includes/header.php';
                                 <?php
                             }
                             ?>
+                            </tbody>
                     </table>
                 </div> 
             </div>

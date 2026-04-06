@@ -58,5 +58,3 @@ $result->free_result();
         <a href="../php/cart.php"><button class="btn">Cart </button></a> 
         </div>
     </div>
-<!--<a href="home.php"><button class="btn">Continue Shopping</button></a>-->
-   

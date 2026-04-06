@@ -16,7 +16,7 @@ require_once __DIR__ . '/../includes/header.php';
            <?= alertMessage(); ?>
 
 <div class="table-responsive">
-    <table class="table table-bordered table-striped user-table">
+    <table id="myTable" class="table table-bordered table-striped user-table">
         <thead>
             <tr>
                 <th>ID</th>
@@ -29,7 +29,12 @@ require_once __DIR__ . '/../includes/header.php';
         </thead>
         <tbody>
             <?php 
+            $query = "SELECT oi.*, g.brand, g.model 
+                      FROM orderedItems oi 
+                      LEFT JOIN goods g ON oi.goods_id = g.id 
+                      ORDER BY oi.id DESC";
             $orderedItems = getAll('orderedItems');
+
             if(mysqli_num_rows($orderedItems) > 0){
                 foreach($orderedItems as $item){
                                   
@@ -38,7 +43,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <tr class="Information">
                         <td data-label="ID"><?= $item['id']; ?></td>
                         <td data-label="Order ID"><?= $item['order_id']; ?></td>
-                        <td data-label="Goods ID"><?= $item['goods_id']; ?></td>
+                        <td data-label="Goods ID"><?= getProduct($item['goods_id']); ?></td>
                         <td data-label="Quantity"><?= $item['quantity']; ?></td>
                         <td data-label="Price">€<?= number_format($item['price'], 2); ?></td>
                         <td data-label="Action">

@@ -17,7 +17,7 @@ require_once __DIR__ . '/../includes/header.php';
            <?= alertMessage(); ?>
 
 <div class="table-responsive">
-    <table class="table table-bordered table-striped user-table">
+    <table id="myTable" class="table table-bordered table-striped user-table">
         <thead>
             <tr>
                 <th>Id</th>

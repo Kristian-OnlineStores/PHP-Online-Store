@@ -2,6 +2,8 @@
 
 session_start();
 
+$pageTitle = "Shopping Cart";
+
 require_once '../php/config/function.php';
 include("../php/Connect/connect.php");
 include("../header.php");

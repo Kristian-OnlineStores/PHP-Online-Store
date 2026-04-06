@@ -35,7 +35,18 @@ require_once __DIR__ . '/../includes/header.php';
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label>User</label>
-                                    <input type="text" value="<?= $order['data']['user_id']; ?>" name="userId" class="form-control" required>
+                                    <select name="user_id" id="user_id" class="form-select" required>
+                                        <option value="">Select User</option>
+                                        <?php
+                                        $users = getAll('users');
+                                        if (mysqli_num_rows($users) > 0) {
+                                            foreach ($users as $user) {
+                                                $selected = ($user['id'] == $order['data']['user_id']) ? 'selected' : '';
+                                                echo '<option value="' . $user['id'] . '" ' . $selected . '>' . $user['id'].' - '.$user['FirstName'].' '.$user['LastName']. '</option>';
+                                            }
+                                        }
+                                        ?>
+                                    </select>
                                 </div>
                             </div>
 

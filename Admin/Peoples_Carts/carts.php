@@ -17,7 +17,7 @@ require_once __DIR__ . '/../includes/header.php';
            <?= alertMessage(); ?>
 
 <div class="table-responsive">
-    <table class="table table-bordered table-striped user-table">
+    <table id="myTable" class="table table-bordered table-striped user-table">
         <thead>
             <tr>
                 <th>Id</th>
@@ -36,8 +36,8 @@ require_once __DIR__ . '/../includes/header.php';
                     
                     <tr class="Information">
     <td data-label="Id"><?= $item['id']; ?></td>
-    <td data-label="User"><?= $item['user_id']; ?></td>
-    <td data-label="Product"><?= $item['goods_id']; ?></td>
+    <td data-label="User"><?= getUser($item['user_id']); ?></td>
+    <td data-label="Product"><?= getProduct($item['goods_id']); ?></td>
     <td data-label="Quantity"><?= $item['quantity']; ?></td>
           
     <td data-label="Action">

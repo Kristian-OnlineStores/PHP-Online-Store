@@ -1,4 +1,7 @@
 <?php
+$pageTitle = "Complain";
+
+
 $servername = "127.0.0.1";
 $username = "root";
 $password = "";
@@ -82,7 +85,7 @@ $con->close();
                 </div>
 
                 <div class="field input">
-                    <textarea id="mesege" name="mesege" rows="4" style="border-radius: 15px;     padding: 8px;    border: 1px solid #ccc; " placeholder="Message" required></textarea>
+                    <textarea id="message" name="message" rows="4" style="border-radius: 15px;     padding: 8px;    border: 1px solid #ccc; " placeholder="Message" required></textarea>
                 </div>
 
                 <div class="field">

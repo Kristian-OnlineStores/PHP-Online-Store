@@ -35,14 +35,15 @@
             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label>User</label>
+                                    
                                     <select name="user_id" id="user_id" class="form-select" required>
                                         <option value="">Select User</option>
                                         <?php
                                         $users = getAll('users');
                                         if (mysqli_num_rows($users) > 0) {
                                             foreach ($users as $user) {
-                                                
-                                                echo '<option value="' . $user['id']. '">' . $user['id'].' - '.$user['FirstName'].' '.$user['LastName']. '</option>';
+                                                $selected = ($user['id'] == $carts['data']['user_id']) ? 'selected' : '';
+                                                echo '<option value="' . $user['id']. '" ' . $selected . '>' . $user['id'].' - '.$user['FirstName'].' '.$user['LastName']. '</option>';
                                             }
                                         }
                                         ?>
@@ -59,9 +60,10 @@
                                         $goods = getAll('goods');
                                         if (mysqli_num_rows($goods) > 0) {
                                             foreach ($goods as $good) {
-                                                echo '<option value="' . $good['id'] . '" data-price="' . $good['price'] . '">'
-                                                    . $good['id'] . ' - ' . $good['brand'] . ' ' . $good['model'] . ' - €' . number_format($good['price'], 2) .
-                                                    '</option>';
+                                                $selected = ($good['id'] == $carts['data']['goods_id']) ? 'selected' : '';
+                                               echo '<option value="' . $good['id'] . '" ' . $selected . ' data-price="' 
+                                               . $good['price'] . '">'. $good['id'] . ' - ' . $good['brand'] . ' ' . $good['model'] . ' - €' . number_format($good['price'], 2)
+                . '</option>';
                                             }
                                         }
                                         ?>

@@ -107,4 +107,75 @@ function getBasePath() {
     
     return '';
 }
+
+function getCount($tableName) {
+    global $con;
+    $tableName = validate($tableName);
+    $query = "SELECT COUNT(*) AS count FROM $tableName";
+    $result = mysqli_query($con, $query);
+    if ($result) {
+        $row = mysqli_fetch_assoc($result);
+        return $row['count'];
+    } else {
+        return 0;
+    }
+}
+                            /////////////// Other Functions //////////////////
+
+                        /////////////// Cart Functions //////////////////
+
+                            function getUser($userId) {
+    global $con;
+    $query = "SELECT id, FirstName, LastName FROM users WHERE id = '$userId'";
+    $result = mysqli_query($con, $query);
+    if ($row = mysqli_fetch_assoc($result)) {
+        return $row['id'] . ' - ' . $row['FirstName'] . ' ' . $row['LastName'];
+    }else {
+    return 'Unknown User';
+    }
+}
+
+function getProduct($productId) {
+    global $con;
+    $query = "SELECT id, brand, model FROM goods WHERE id = '$productId'";
+    $result = mysqli_query($con, $query);
+    if ($row = mysqli_fetch_assoc($result)) {
+        return $row['id'] . ' - ' . $row['brand'] . ' ' . $row['model'];
+    }else {
+    return 'Unknown Product';
+    }
+}
+
+function getService($serviceId) {
+    global $con;
+
+    if ($serviceId == ' ' || $serviceId == 'Select' || $serviceId == 'NULL') {
+        return 'No Service Selected';
+    }else{
+        $serviceId = validate($serviceId); // Sanitize user input to prevent SQL injection
+   
+    $query = "SELECT id, name FROM services WHERE id = '$serviceId'";
+    $result = mysqli_query($con, $query);
+
+    if ($row = mysqli_fetch_assoc($result)) {
+        return $row['id'] . ' - ' . $row['name'];
+    }else {
+    return 'Unknown Service';
+    }
+    }
+}
+                            /////////////// Cart Functions //////////////////
+
+                        ///////////////  //////////////////
+
+function webSetting($columName) 
+{
+    $setting = getById('settings', 1);
+    if ($setting['status'] == 200) {
+        return  $setting['data'][$columName];
+    } else {
+        return null;
+    }
+                        }
+
 ?>

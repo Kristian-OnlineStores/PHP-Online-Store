@@ -1,6 +1,8 @@
 <?php
-
 session_start();
+
+$pageTitle = "Checkout";
+
 include("Connect/connect.php");
 require_once 'config/function.php';
 
@@ -119,7 +121,7 @@ foreach ($_SESSION['cart'] as $item) {
             <a href="cart.php"><button class="btn">Back to Cart</button></a>
             <a href="complain.php"> <button class="btn">Complain</button></a>
             <div class="dropdown">
-                <button class="dropbtn"> <b><?php echo $res_FirstName . ' ' . $res_LastName; ?></b></button>
+                <button class="drop-btn"> <b><?php echo $res_FirstName . ' ' . $res_LastName; ?></b></button>
                 <div class="dropdown-content">
                     <a href="update.php?Id=<?php echo $res_id; ?>">Update Profile</a>
                     <a href="logout.php">Log Out</a>

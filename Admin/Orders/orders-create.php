@@ -20,11 +20,20 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label>User</label>
-                                    <input type="text" name="userId" class="form-control" required>
-                                    <?php
-                                    ?>
+                                    <select name="user_id" id="user_id" class="form-select" required>
+                                        <option value="">Select User</option>
+                                        <?php
+                                        $users = getAll('users');
+                                        if (mysqli_num_rows($users) > 0) {
+                                            foreach ($users as $user) {
+                                                echo '<option value="' . $user['id'] . '">' . $user['id'].' - '.$user['FirstName'].' '.$user['LastName']. '</option>';
+                                            }
+                                        }
+                                        ?>
+                                    </select>
                                 </div>
                             </div>
+                   
 
                             <div class="col-md-6">
                                 <div class="mb-3">

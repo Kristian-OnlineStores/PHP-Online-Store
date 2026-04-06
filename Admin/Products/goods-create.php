@@ -56,7 +56,6 @@
                                 <div class="mb-3">
                                     <label>Sale Status</label>
                                     <br/>
-                    <!--<input type="hidden" name="Sale1" value="0">-->
                                     <input type="checkbox" name="saleCheckbox" id="saleCheckbox" value="1" style="width:30px; height: 30px" 
                                     onclick="toggleDiscountField()"/>
                                 </div>
@@ -81,7 +80,10 @@
                                 </div>
                             </div>
 
-
+<!--<div class="mb-3">
+<label>Upload Image</label>
+<input type="file" name="image" class="form-control">
+</div>-->
                             
                         </div>
                             

@@ -40,7 +40,8 @@ $base_url = getBasePath();
 -->
    <link id="pagestyle" href="<?= $base_url ?>assets/css/soft-ui-dashboard.css?v=1.1.0" rel="stylesheet" />
 
-  
+   <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css" />
 </head>
 
 <body class="g-sidenav-show  bg-gray-100">

@@ -277,7 +277,51 @@ if (isset($_POST['updateOrderedItem'])) {
     }
 }
 
-                   //////////////////////// Social Media ////////////////// 
+                   //////////////////////// End Ordered Items ////////////////// 
+
+                      //////////////////////// Services ////////////////// 
+
+if (isset($_POST['saveService'])) {
+    $name = validate($_POST['name']);
+    $description = validate($_POST['description']);
+    $status = isset($_POST['status']) ? 1 : 0;
+
+    if ($name != '' && $description != '' ) {
+        $query = "INSERT INTO services (Name, Description, Status) VALUES ('$name', '$description', '$status')";
+        $result = mysqli_query($con, $query);
+
+        if ($result) {
+            redirect('Service/services.php', 'Service Created Successfully');
+        } else {
+            redirect('Service/services-create.php', 'Something Went Wrong');
+        }
+    } else {
+        redirect('Service/services-create.php', 'Please fill all input fields');
+    }
+}
+
+if (isset($_POST['updateService'])) {
+    $name = validate($_POST['name']);
+    $description = validate($_POST['description']);
+    $status = validate($_POST['status']) == true? 1 : 0;
+    $serviceId = validate($_POST['serviceId']);
+
+    if ($name != '' && $description != '' ) {   
+        $query = "UPDATE services SET Name='$name', Description='$description', Status='$status' WHERE id='$serviceId'";
+        $result = mysqli_query($con, $query);
+        if ($result) {
+            redirect('Service/services.php', 'Service Updated Successfully');
+        } else {
+            redirect('Service/services-edit.php?id='.$ServiceId, 'Something Went Wrong');
+        }
+    } else {
+        redirect('Service/services-edit.php?id='.$ServiceId, 'Please fill all input fields');
+    }
+}
+
+                   //////////////////////// End Services ////////////////// 
+
+                      //////////////////////// Social Media ////////////////// 
 
 if (isset($_POST['saveSocialMedia'])) {
     $name = validate($_POST['name']);
@@ -317,5 +361,138 @@ if (isset($_POST['updateSocialMedia'])) {
     } else {
         redirect('Social_Media/social_media-edit.php?id='.$SocialMediaId, 'Please fill all input fields');
     }
+}
+
+                   //////////////////////// End Social Media ////////////////// 
+
+                      //////////////////////// Enquiries ////////////////// 
+
+if (isset($_POST['saveEnquiry'])) {
+    $name = validate($_POST['name']);
+    $email = validate($_POST['email']);
+    $service = validate($_POST['service']);
+    $message = validate($_POST['message']);
+
+    if ($name != '' && $email != ''  && $message != '') {
+        $query = "INSERT INTO enquiries (Name, Email, Service, Message) VALUES ('$name', '$email', '$service', '$message')";
+        $result = mysqli_query($con, $query);
+
+        if ($result) {
+            redirect('Enquiries/enquirie.php', 'Enquiry Created Successfully');
+        } else {
+            redirect('Enquiries/enquirie-create.php', 'Something Went Wrong');
+        }
+    } else {
+        redirect('Enquiries/enquirie-create.php', 'Please fill all input fields');
+    }
+}
+
+if (isset($_POST['updateEnquiry'])) {
+    $Name = validate($_POST['name']);
+    $Email = validate($_POST['email']);
+    $Service = validate($_POST['service']);
+    $Message = validate($_POST['message']);
+    $EnquiryId = validate($_POST['enquiryId']);
+
+    if ($Name != '' && $Email != ''  && $Message != '') {
+        if ($Service == '' || $Service == 'Select' || $Service == 'NULL') {
+            $Service = ' ';
+        }
+        $query = "UPDATE enquiries SET Name='$Name', Email='$Email', Service='$Service', Message='$Message' WHERE id='$EnquiryId'";
+        $result = mysqli_query($con, $query);
+
+        if ($result) {
+            redirect('Enquiries/enquirie.php', 'Enquiry Updated Successfully');
+        } else {
+            redirect('Enquiries/enquirie-edit.php?id='.$EnquiryId, 'Something Went Wrong');
+        }
+    } else {
+        redirect('Enquiries/enquirie-edit.php?id='.$EnquiryId, 'Please fill all input fields');
+    }
+}
+
+                   //////////////////////// End Enquiries ////////////////// 
+
+                      //////////////////////// Cart ////////////////// 
+
+                      if (isset($_POST['saveCart'])) {
+    $user_id = validate($_POST['user_id']);
+    $goods_id = validate($_POST['goods_id']);
+    $quantity = validate($_POST['quantity']);
+
+    if ($user_id != '' && $goods_id != '' && $quantity != '') {
+        $query = "INSERT INTO cart (user_id, goods_id, quantity) VALUES ('$user_id', '$goods_id', '$quantity')";
+        $result = mysqli_query($con, $query);
+
+        if ($result) {
+            redirect('Peoples_Carts/carts.php', 'Cart Created Successfully');
+        } else {
+            redirect('Peoples_Carts/carts-create.php', 'Something Went Wrong');
+        }
+    } else {
+        redirect('Peoples_Carts/carts-create.php', 'Please fill all input fields');
+    }
+}
+
+if (isset($_POST['updateCart'])) {
+    $user_id = validate($_POST['user_id']);
+    $goods_id = validate($_POST['goods_id']);
+    $quantity = validate($_POST['quantity']);
+    $cartId = validate($_POST['cartId']);
+
+    if ($user_id != '' && $goods_id != '' && $quantity != '') {
+        $query = "UPDATE cart SET user_id='$user_id', goods_id='$goods_id', quantity='$quantity' WHERE id='$cartId'";
+        $result = mysqli_query($con, $query);
+
+        if ($result) {
+            redirect('Peoples_Carts/carts.php', 'Cart Updated Successfully');
+        } else {
+            redirect('Peoples_Carts/carts-edit.php?id='.$cartId, 'Something Went Wrong');
+        }
+    } else {
+        redirect('Peoples_Carts/carts-edit.php?id='.$cartId, 'Please fill all input fields');
+    }
+}
+
+                   //////////////////////// End Cart ////////////////// 
+
+                      //////////////////////// Settings ////////////////// 
+if (isset($_POST['saveSetting'])) {
+    $settingID = validate($_POST['settingID']);
+
+    $tittle = validate($_POST['title']);
+    $url = validate($_POST['url']);
+    $small_description = validate($_POST['small_description']);
+
+    $meta_description = validate($_POST['meta_description']);
+    $meta_keyword = validate($_POST['meta_keyword']);
+
+    $email = validate($_POST['email']);
+    $email2 = validate($_POST['email2']);
+    $phone = validate($_POST['phone']);
+    $phone2 = validate($_POST['phone2']);
+    $address = validate($_POST['address']);
+if ($settingID == 'insert') {
+ if ($tittle != '' && $url != '' && $small_description != '') {
+        $query = "INSERT INTO settings (title, url, small_description, meta_description, meta_keyword, email, email2, phone, phone2, address) 
+        VALUES ('$tittle', '$url', '$small_description', '$meta_description', '$meta_keyword', '$email', '$email2', '$phone', '$phone2', '$address')";
+        $result = mysqli_query($con, $query);
+}
+}
+
+if ($settingID != 'insert' || is_numeric($settingID)) {
+    
+        $query = "UPDATE settings SET title='$tittle', url='$url', small_description='$small_description', meta_description='$meta_description', meta_keyword='$meta_keyword', email='$email',
+        email2='$email2', phone='$phone', phone2='$phone2', address='$address' WHERE id='$settingID'";
+        $result = mysqli_query($con, $query);
+    
+}
+        if ($result) {
+            redirect('Settings/settings.php', 'Settings Saved Successfully');
+        } else {
+            redirect('Settings/settings-create.php', 'Something Went Wrong');
+        }
+    
+
 }
 ?>

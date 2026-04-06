@@ -12,6 +12,29 @@
      die("Connection failed: " . $con->connect_error);
  }
  
+$sql = "CREATE TABLE IF NOT EXISTS enquiries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    service VARCHAR(255) NULL,
+    message VARCHAR(500)  NULL,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)";
+if ($con->query($sql) === false) {
+    echo "Error creating table: " . $con->error;
+} 
+
+$sql = "CREATE TABLE IF NOT EXISTS services (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    status TINYINT(1) DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)";
+if ($con->query($sql) === false) {
+    echo "Error creating table: " . $con->error;
+} 
  
  $sql = "CREATE TABLE IF NOT EXISTS users (
      id INT AUTO_INCREMENT PRIMARY KEY,
@@ -29,37 +52,6 @@
  if ($con->query($sql) === false) {
      echo "Error creating table: " . $con->error;
  } 
-
-/*$admin_email = "Admin@admin.com";
-$admin_password = password_hash("adMiN", PASSWORD_DEFAULT);
-$admin_firstname = "K";
-$admin_lastname = "M";
-
-$check_admin = $con->prepare("SELECT id FROM users WHERE Email = ?");
-$check_admin->bind_param("s", $admin_email);
-$check_admin->execute();
-$check_admin->store_result();
-
-if ($check_admin->num_rows == 0) {
-    $create_admin = $con->prepare("INSERT INTO users (FirstName, LastName, Email, Password, Role) VALUES (?, ?, ?, ?, 'admin')");
-    $create_admin->bind_param("ssss", $admin_firstname, $admin_lastname, $admin_email, $admin_password);
-    
-    if ($create_admin->execute()) {
-        error_log(" Administrator account created:  $admin_email / admin");
-    } else {
-        error_log(" Error creating administrator: " . $con->error);
-    }
-    $create_admin->close();
-}
-
-$check_admin->close();*/
-
-
-
-
-
-
-
 
 
 $sql = "CREATE TABLE IF NOT EXISTS goods (
@@ -117,8 +109,8 @@ $sql = "CREATE TABLE IF NOT EXISTS orderedItems (
     goods_id INT NOT NULL,
     quantity INT NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(id),
-    FOREIGN KEY (goods_id) REFERENCES goods(id)
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL,
+    FOREIGN KEY (goods_id) REFERENCES goods(id) ON DELETE SET NULL
 )";
 if ($con->query($sql) === false) {
     echo "Error creating table: " . $con->error;
@@ -134,13 +126,6 @@ $sql = "CREATE TABLE IF NOT EXISTS social_media (
 if ($con->query($sql) === false) {
     echo "Error creating table: " . $con->error;
 } 
-
-
-
-
-
-
-
 
 $checkIfExistsQuery = "SELECT * FROM goods";
 $result = $con->query($checkIfExistsQuery);
@@ -159,6 +144,48 @@ if ($result->num_rows === 0) {
     } 
 } 
 
+$sql = "CREATE TABLE IF NOT EXISTS settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) ,
+    url VARCHAR(255) NULL,
+    small_description VARCHAR(255) NULL,
+    meta_description VARCHAR(255) NULL,
+    meta_keyword VARCHAR(255) NULL,
+    email VARCHAR(255) NULL,
+    email2 VARCHAR(255) NULL,
+     phone VARCHAR(20) NULL,
+     phone2 VARCHAR(20) NULL,
+     address VARCHAR(255) NULL
+)";
+if ($con->query($sql) === false) {
+    echo "Error creating table: " . $con->error;
+} 
 
 
+
+
+
+/*$admin_email = "Admin@admin.com";
+$admin_password = password_hash("adMiN", PASSWORD_DEFAULT);
+$admin_firstname = "K";
+$admin_lastname = "M";
+
+$check_admin = $con->prepare("SELECT id FROM users WHERE Email = ?");
+$check_admin->bind_param("s", $admin_email);
+$check_admin->execute();
+$check_admin->store_result();
+
+if ($check_admin->num_rows == 0) {
+    $create_admin = $con->prepare("INSERT INTO users (FirstName, LastName, Email, Password, Role) VALUES (?, ?, ?, ?, 'admin')");
+    $create_admin->bind_param("ssss", $admin_firstname, $admin_lastname, $admin_email, $admin_password);
+    
+    if ($create_admin->execute()) {
+        error_log(" Administrator account created:  $admin_email / admin");
+    } else {
+        error_log(" Error creating administrator: " . $con->error);
+    }
+    $create_admin->close();
+}
+
+$check_admin->close();*/
 ?>
